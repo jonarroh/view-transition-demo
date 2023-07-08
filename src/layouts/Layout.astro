@@ -99,9 +99,9 @@ const { title } = Astro.props;
 					//@ts-ignore
 					document.startViewTransition(() => {
 						//@ts-ignore
-						document.getElementById('content').innerHTML = body;
-						//@ts-ignore
 						document.scrollingElement.scrollTop = 0;
+						//@ts-ignore
+						document.getElementById('content').innerHTML = body;
 					});
 				}
 			});
