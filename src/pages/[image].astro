@@ -1,0 +1,40 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { dbImages } from '../../src/db/images';
+const { image } = Astro.params;
+
+//saber si la imagen existe
+const imageExists = dbImages.find(img => img.id === image);
+
+if (!imageExists) {
+  return Astro.redirect('/404');
+}
+---
+
+<Layout title={imageExists.title}>
+  <section class="flex flex-row">
+    <div class="w-1/2">
+      <img
+        style=`view-transition-name: ${imageExists.id}`
+        class="rounded-md shadow-md"
+        src={`${imageExists.image}`}
+        alt={imageExists.descripcion}
+      />
+    </div>
+    <div class="w-1/2">
+      <h1 class="text-2xl font-bold text-amber-400">
+        {imageExists.title}
+      </h1>
+      <p class="text-slate-200">{imageExists.descripcion}</p>
+      <p class="text-gray-500">
+        Hecho en: <strong>{imageExists.IA}</strong>
+      </p>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  img {
+    display: inline;
+  }
+</style>

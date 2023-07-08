@@ -7,30 +7,103 @@ const { title } = Astro.props;
 ---
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es" class="bg-[#383838]">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="description" content="Astro description">
+		<meta name="description" content="Astro description" />
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
+		<meta name="view-transition" content="same-origin" />
 		<title>{title}</title>
 	</head>
 	<body>
-		<slot />
+		<main class="flex flex-col min-h-screen px-4 py-6" id="content">
+			<slot />
+		</main>
 	</body>
 </html>
 <style is:global>
 	:root {
 		--accent: 124, 58, 237;
-		--accent-gradient: linear-gradient(45deg, rgb(var(--accent)), #da62c4 30%, white 60%);
+		--accent-gradient: linear-gradient(
+			45deg,
+			rgb(var(--accent)),
+			#da62c4 30%,
+			white 60%
+		);
 	}
 	html {
 		font-family: system-ui, sans-serif;
-		background-color: #F6F6F6;
+		background-color: #f6f6f6;
 	}
 	code {
-		font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono,
-			Bitstream Vera Sans Mono, Courier New, monospace;
+		font-family: Menlo, Monaco, Lucida Console, Liberation Mono,
+			DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New,
+			monospace;
 	}
+	/* @keyframes grow-x {
+		from {
+			transform: scaleX(0);
+		}
+		to {
+			transform: scaleX(1);
+		}
+	}
+
+	@keyframes shrink-x {
+		from {
+			transform: scaleX(1);
+		}
+		to {
+			transform: scaleX(0);
+		}
+	}
+
+	::view-transition-old(root),
+	::view-transition-new(root) {
+		height: auto;
+		right: 0;
+		left: auto;
+		transform-origin: right center;
+	}
+
+	::view-transition-old(root) {
+		animation: 0.2s linear both shrink-x;
+	}
+
+	::view-transition-new(root) {
+		animation: 0.2s 0.2s linear both grow-x;
+	} */
 </style>
+
+<script>
+	//@ts-ignore
+	if (document.startViewTransition) {
+		//@ts-ignore
+		window.navigation.addEventListener('navigate', event => {
+			const url = new URL(event.destination.url);
+
+			if (location.origin != url.origin) return;
+
+			event.intercept({
+				async handler() {
+					const response = await fetch(url.pathname);
+					const html = await response.text();
+					//quedarnos solo con el body
+					const matchResult = html.match(
+						/<body[^>]*>([\s\S]*)<\/body>/i
+					);
+					const body = matchResult ? matchResult[1] : '';
+					//@ts-ignore
+					document.startViewTransition(() => {
+						//@ts-ignore
+						document.getElementById('content').innerHTML = body;
+						//@ts-ignore
+						document.scrollingElement.scrollTop = 0;
+					});
+				}
+			});
+		});
+	}
+</script>
